@@ -33,16 +33,19 @@ module FileHandling
       write_file_append
     elsif user_input.to_i == 6
       remove_file
+    elsif user_input.to_i == 7
+      reverse_file
+    elsif user_input.to_i == 8
+      count
     elsif user_input == 'help'
       puts Constants::MENU_COMMANDS
     end
   end
 
-
   private
 
   def self.get_file_by_name(file_name)
-    Dir.entries(current_directory).each do |file|
+    Dir.entries(current_directory).my_each do |file|
       return file if file.split('.')[0] == file_name
     end
   end
@@ -80,12 +83,12 @@ module FileHandling
     end
   end
 
-  def self.write_file(mode = 'w:UTF-8')
+  def self.write_file(mode = 'w:UTF-8', text = nil)
     # TODO: Придумать  как сделать
     # что бы можно было писать в файл более одной строки
     # например сделать так что бы по нажатию на ctrl + q
     # запись в файл прекращалась
-    text = input_text
+    text = text.nil? ? input_text : text
     File.open("./#{file_name}.txt", mode) do |file|
       file.puts text
     end
@@ -119,5 +122,47 @@ module FileHandling
     file = file_name('Введите имя файла который хотите удалить:')
     File.delete("#{file}.txt")
     puts 'Файл успешно удален!'
+  end
+
+  def self.count
+    path = get_file_by_name(file_name)
+
+    raise 'Файл не найден!' unless File.exist?(path)
+
+    readlines = nil
+
+    File.open("./#{path}", 'r:UTF-8') do |file|
+      readlines = file.readlines
+    end
+    puts "Количество строк: #{count_str(readlines)}, символов: #{count_char(readlines)} в файле #{path}"
+  end
+
+  def self.count_str(arr)
+    arr.my_size
+  end
+
+  # тут учитываються управ. символы
+  # так же узнал что в linux есть команда wc -m file_name.txt
+  # она тоже их учитывает
+  def self.count_char(arr)
+    size = 0
+    arr.my_each do |line|
+      size += line.length
+    end
+    size
+  end
+
+  def self.reverse_file
+    file_original = file_name('Введите имя файла который хотите реверснуть:')
+    readlines = nil
+    File.open("./#{file_original}.txt", 'r:UTF-8') do |file|
+      readlines = file.readlines
+    end
+    File.open("./#{file_original}_reverse.txt", 'w:UTF-8') do |file|
+      readlines.my_reverse.my_each do |line|
+        file.puts line
+      end
+    end
+    puts 'Файл успешно реверснут!'
   end
 end
