@@ -38,45 +38,47 @@ def play_again?
 end
 
 def winner(comp_sign, user_input)
-  sleep 1
-
+  # тут вложенный цикл надо переделать
   return 'Ничья!' if user_input == comp_sign
 
   i = 0
   while i < CONDITIONS.length
-    next unless CONDITIONS[i][0] == user_input && CONDITIONS[i][1] == comp_sign
-
-    who_win = CONDITIONS[i][-1]
-    who_win = who_win == 'user_win' ? 'Вы победили!' : 'Победил компьтер!'
-    return who_win
+    if CONDITIONS[i][0] == user_input && CONDITIONS[i][1] == comp_sign
+      who_win = CONDITIONS[i][-1]
+      who_win = who_win == 'user_win' ? 'Вы победили!' : 'Победил компьтер!'
+      return who_win
+    end
+    i += 1
   end
 end
 
-def display_select_signs(user_input, comp_sign, round)
+def display_select_signs(user_input, comp_sign)
   sleep 1
   puts "Пользователь выбрал: #{user_input}"
   puts "Компьютер выбрал: #{comp_sign}"
 end
 
 
-round = 0
+round = 1
 
 begin
   loop do
+    puts "Раунд #{round}"
+
     comp_sign = SIGNS.sample
 
     puts COMMAND_LIST
 
     user_input = handler_for_user_input(input)
-    display_select_signs(user_input, comp_sign, round)
+    display_select_signs(user_input, comp_sign)
 
-    round += 1
     if round == 3
-      puts winner(comp_sign, user_input)
+      p winner(comp_sign, user_input)
       play_again? ? round = 0 : break
     end
+    round += 1
+    puts '========='
   rescue StandardError => e
-    round -= 1
     puts "Возникла ошибка: #{e.message}."
   end
 rescue Interrupt
